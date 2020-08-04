@@ -123,18 +123,7 @@ class InfiniteCarousel extends Component {
             ...settings[element],
             ...scrollOnDeviceProps,
           };
-          const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-          const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
-          this.setState(
-            {
-              settings: newSettings,
-              children,
-              slideUniqueIds,
-              lowerBreakpoint,
-              higherBreakpoint,
-            },
-            this.setDimensions
-          );
+          this.generateChildren(propChildren, newSettings);
         });
       });
 
@@ -149,18 +138,7 @@ class InfiniteCarousel extends Component {
           ...this.props,
           ...scrollOnDeviceProps,
         };
-        const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-        const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
-        this.setState(
-          {
-            settings: newSettings,
-            children,
-            slideUniqueIds,
-            lowerBreakpoint: undefined,
-            higherBreakpoint: undefined,
-          },
-          this.setDimensions
-        );
+        this.generateChildren(propChildren, newSettings);
       });
     }
   };
@@ -383,7 +361,7 @@ class InfiniteCarousel extends Component {
   };
 
   onWindowResized = () => {
-    this.setDimensions();
+    this.init();
   };
 
   onMouseEnter = () => {
@@ -584,6 +562,21 @@ class InfiniteCarousel extends Component {
     padding: 0,
     boxSizing: 'border-box',
     MozBoxSizing: 'border-box',
+  };
+
+  generateChildren = (propChildren, newSettings) => {
+    const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
+    const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
+    this.setState(
+      {
+        settings: newSettings,
+        children,
+        slideUniqueIds,
+        lowerBreakpoint: undefined,
+        higherBreakpoint: undefined,
+      },
+      this.setDimensions
+    );
   };
 
   getSlideStyles = isVisible => {
@@ -840,21 +833,9 @@ class InfiniteCarousel extends Component {
   };
 
   generateChildrenFromProps() {
-    const { children } = this.props;
+    const { children: propChildren } = this.props;
     const settings = this.getSettingsForScrollOnDevice();
-    const { slidesToShow } = settings;
-    const newChildren = this.getChildrenList(children, slidesToShow);
-    const slideUniqueIds = newChildren.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
-    this.setState(
-      {
-        children: newChildren,
-        slideUniqueIds,
-        settings,
-      },
-      () => {
-        this.setDimensions();
-      }
-    );
+    this.generateChildren(propChildren, settings);
   }
 
   render() {
